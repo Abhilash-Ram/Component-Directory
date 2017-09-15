@@ -1,0 +1,389 @@
+<html ng-app="app">
+	<head>
+		<title>Dynamic forms</title>
+		  <meta charset="utf-8">
+		  <meta name="viewport" content="width=device-width, initial-scale=1">
+		  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.13/angular.min.js"></script>
+
+		  <script type="text/javascript" src="index.js"></script>
+
+		  <script type="text/javascript" src="directives/accordionComponent.js"></script>
+		  <script type="text/javascript" src="directives/buttonComponent.js"></script>
+		  <script type="text/javascript" src="directives/checkboxComponent.js"></script>
+		  <script type="text/javascript" src="directives/componentDirectory.js"></script>
+		  <script type="text/javascript" src="directives/dropdownComponent.js"></script>
+		  <script type="text/javascript" src="directives/errorComponent.js"></script>
+		  <script type="text/javascript" src="directives/formComponent.js"></script>
+		  <script type="text/javascript" src="directives/headerComponent.js"></script>
+		  <script type="text/javascript" src="directives/inputComponent.js"></script>
+		  <script type="text/javascript" src="directives/labelComponent.js"></script>
+		  <script type="text/javascript" src="directives/layoutComponent.js"></script>
+		  <script type="text/javascript" src="directives/loopComponent.js"></script>
+		  <script type="text/javascript" src="directives/radioComponent.js"></script>
+		  <script type="text/javascript" src="directives/sectionComponent.js"></script>
+		  <script type="text/javascript" src="directives/textareaComponent.js"></script>
+
+
+		<style>
+		.btn{
+			margin: 5px 5px 5px 5px;
+		}
+		</style>
+	</head>
+	<body ng-controller="ctrl as vm">
+	<nav class="navbar">
+	</nav>	
+		<div class="col-md-12">
+			<component-directory config="vm.solo"></component-directory>
+			<component-directory config="vm.configuration"></component-directory>
+		</div>
+
+	</body>
+	<script>
+		angular
+			.module( "app", ['component'])
+			.controller( "ctrl", ctrl)
+			.service( "service", service);
+
+			function service($http, $q){
+				this.get = function(){					
+					var d = $q.defer();
+					$http.get("http://demo2788510.mockable.io/get")
+					.then(function(res){
+						d.resolve(res.data);
+					},function(error){
+						d.reject();
+					});
+					return d.promise;
+				}
+			}
+
+			function ctrl(service){
+				
+				var vm = this;
+
+				Object.defineProperty(Object.prototype, '$getValue',{
+					value : function() {
+						return vm.data;
+					},
+					enumerable : false,
+					configurable:false,
+					writable:true
+				});
+
+				vm.source = [{
+							"id"  :1,
+							"shortName":"arun"
+							},{
+							"id"  :2,
+							"shortName":"agarwal"
+							},{
+							"id"  :3,
+							"shortName":"sri ram"
+							},{
+							"id"  :4,
+							"shortName":"babu"
+							},{
+							"id"  :1,
+							"shortName":"arun"
+							}];
+
+				vm.getData = function(i){
+					return vm.source;
+				}
+
+				function start(){
+					service.get()
+					 .then(function(res){
+					 	return res;	
+					 });
+				}
+
+				start();
+
+				vm.getStates = function(a){
+					console.log("one")
+				}
+
+				vm.setCountry = function(){
+					console.log("two")
+				}
+				
+				vm.saveMethod = function(){
+					console.log("action called save");
+					console.log(vm.configuration.$getValue())
+				}
+
+				vm.clearMethod = function(){
+					console.log("action called clear");
+				}
+
+				// vm.solo = {
+				// 	type:'layout',
+				// 	columns:6,
+				// 	items:[{
+				// 		type:"text",
+				// 		model:"text",
+				// 		title:"text"
+				// 	}]
+				// }
+
+				vm.configuration = {
+					type:"form",
+					header:{
+						title:"Sample form",
+						size:"lg"
+					},
+					items:[{
+						type:"section",
+						format:"panel",
+						header:{
+							title:"sub-heading1",
+							size:"md"
+						},
+						items:[{
+							type:"layout",
+							columns:2,
+							items:[{
+								type:'text',
+								title:"First Name",
+								model:"firstName"
+							},{
+								type:'text',
+								title:"Last Name",
+								model:"lastName"
+							},{
+								type:'email',
+								title:"Email Id",
+								model:"emailId"
+							},{
+								type:'number',
+								title:"Phone Number",
+								model:"phoneNumber"
+							}]
+						},{
+							type:'layout',
+							columns:3,
+							items:[{
+								type:"dropdown",
+								title:"Country",
+								model:"country",
+								placeholder:"Select one",
+								labelKey:"shortName",
+								showmode:true,
+								method:"vm.getData()",
+								ngChange:["vm.getStates(vm.data.country)", "vm.setCountry()"]
+							},{
+								type:"dropdown",
+								title:"State",
+								labelKey:"shortName",
+								model:"state",
+								placeholder:"Select one",
+								parent:"country",
+								method:"vm.getData()",
+								showmode:true
+							},{
+								type:"dropdown",
+								title:"City",
+								model:"city",
+								parent:"state",
+								placeholder:"Select one",
+								method:"vm.getData()",
+								labelKey:"shortName",
+								showmode:true
+							}]
+						}]
+					},{
+						type:"section",
+						format:"accordion",
+						header:{
+							title:"sub-heading1",
+							size:"md"
+						},
+						items:[{
+							type:"layout",
+							columns:4,
+							items:[{
+								type:'text',
+								title:"First Name",
+								model:"firstName"
+							},{
+								type:'text',
+								title:"Last Name",
+								model:"lastName"
+							},{
+								type:'email',
+								title:"Email Id",
+								model:"emailId"
+							},{
+								type:'radio',
+								title:"Under 21",
+								model:"under21",
+								idKey:'id',
+								labelKey:'shortName',
+								data:[{
+									id:0,
+									value:'Yes'
+								},{
+									id:1,
+									value:'No'
+								}]
+							}]
+						},{
+							type:'layout',
+							columns:1,
+							items:[{
+								type:"dropdown",
+								title:"Country",
+								model:"country",
+								placeholder:"Select one",
+								labelKey:"shortName",
+								showmode:true,
+								method:"vm.getData()",
+								ngChange:["vm.getStates(vm.data.country)", "vm.setCountry()"]
+							},{
+								type:"dropdown",
+								title:"State",
+								labelKey:"shortName",
+								model:"state",
+								placeholder:"Select one",
+								parent:"country",
+								method:"vm.getData()",
+								showmode:true
+							},{
+								type:"dropdown",
+								title:"City",
+								model:"city",
+								parent:"state",
+								placeholder:"Select one",
+								method:"vm.getData()",
+								labelKey:"shortName",
+								showmode:true
+							}]
+						}]
+					}],
+					action:[{
+						type:"button",
+						title:"Save",
+						classes:"btn btn-warning",
+						onClick:"vm.saveMethod()"
+					}]
+				}
+
+				vm.configuration1 = {
+					type:"form",
+					name:"prayerReq",
+					header:{
+							title: 'Prayer Request',
+							size:"md"
+						},
+					items:[{
+						type:'section',
+						format:'accordion',
+						header:{
+							title: 'Personal Information',
+							size:"sm"
+						},
+						items:[{
+									type:"dropdown",
+									title:"Category",
+									model:"category",
+									idKey:"id",
+									labelKey:"shortName",
+									showmode:false,
+									placeholder:"Select one",
+									data:"vm.source"
+									},{
+										type:"text",
+										title:"Title",
+										model:"title",
+										showmode:true,
+										placeholder:"Title"
+									},{
+										type:"text",
+										title:"Username",
+										model:"username",
+										showmode:true,
+										placeholder:"Please enter username"
+									},{
+										type:"textarea",
+										title:"Comments",
+										model:"comments",
+										showmode:true,
+										placeholder:"Please enter comments"
+									},{
+										type:"dropdown",
+										title:"Moderator",
+										model:"moderator",
+										placeholder:"Select one",
+										showmode:false
+									},{
+										type:"dropdown",
+										title:"Location",
+										model:"location",
+										placeholder:"Select one",
+										showmode:false,
+										method:"vm.getData()"
+									},{
+										type:"dropdown",
+										title:"Privacy",
+										model:"privacy",
+										labelKey:"shortName",
+										placeholder:"Select one",
+										showmode:false,
+										method:"vm.getData()"
+						}]						
+					},{
+						type:'section',
+						format:'panel',
+						header:{
+							title: 'Demographic Information',
+							size:"sm"
+						},
+						items:[{
+										type:"dropdown",
+										title:"Country",
+										model:"country",
+										placeholder:"Select one",
+										labelKey:"shortName",
+										showmode:true,
+										method:"vm.getData()",
+										ngChange:["vm.getStates(vm.data.country)", "vm.setCountry()"]
+									},{
+										type:"dropdown",
+										title:"State",
+										labelKey:"shortName",
+										model:"state",
+										placeholder:"Select one",
+										parent:"country",
+										method:"vm.getData()",
+										showmode:true
+									},{
+										type:"dropdown",
+										title:"City",
+										model:"city",
+										parent:"state",
+										placeholder:"Select one",
+										method:"vm.getData()",
+										labelKey:"shortName",
+										showmode:true
+									}]
+					}],
+					action:[{
+						type:"button",
+						classes:"btn btn-primary",
+						title:"save",
+						ngClick:"vm.saveMethod()"
+					},{
+						type:"button",
+						classes:"btn btn-default",
+						title:"clear",
+						ngClick:"vm.clearMethod()"
+					}]
+				}
+			};
+	</Script>
+	</html>
